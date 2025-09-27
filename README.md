@@ -490,8 +490,6 @@ Your frontend is now a professional RAG-powered news chatbot with modern UI, int
 - [ ] Error monitoring active
 - [ ] Performance monitoring setup
 
-<<<<<<< HEAD
-**Ready for production!** Your RAG chatbot frontend provides an enterprise-quality chat experience with real AI intelligence and news source attribution.
-=======
+
 **Ready for production!** Your RAG chatbot frontend provides an enterprise-quality chat experience with real AI intelligence and news source attribution.
 >>>>>>> d1cd265 (new updates which inlcudes persistent data store using redis)
