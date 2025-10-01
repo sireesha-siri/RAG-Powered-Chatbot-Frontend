@@ -1,4 +1,4 @@
-# Voosh News Chatbot - Frontend
+# Siri's News Assistant - Frontend
 
 A modern, responsive chat interface for the RAG-powered news chatbot that provides intelligent responses about current events with source attribution.
 
