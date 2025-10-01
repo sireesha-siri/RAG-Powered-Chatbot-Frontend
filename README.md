@@ -491,5 +491,16 @@ Your frontend is now a professional RAG-powered news chatbot with modern UI, int
 - [ ] Performance monitoring setup
 
 
+## 🙏 Acknowledgments
+
+This frontend was developed with assistance from AI-powered development tools:
+
+- **[Anthropic Claude](https://www.anthropic.com/claude)** - Component architecture design, state management patterns, and responsive UI/UX implementation
+- **[ChatGPT](https://openai.com/chatgpt)** - React best practices, styling solutions, and feature implementation guidance
+- **[Cursor AI](https://cursor.sh/)** - AI-assisted code editing, refactoring, and real-time suggestions
+- **[GitHub Copilot](https://github.com/features/copilot)** - Code completion, boilerplate generation, and productivity enhancement
+
+These tools accelerated development while maintaining code quality and modern React best practices.
+
 **Ready for production!** Your RAG chatbot frontend provides an enterprise-quality chat experience with real AI intelligence and news source attribution.
 

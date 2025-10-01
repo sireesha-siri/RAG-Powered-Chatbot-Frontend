@@ -120,7 +120,7 @@ const ChatUI = () => {
       } else {
         setMessages([{
           id: Date.now(),
-          text: "Hello! I'm the Voosh News Chatbot. I can help you find the latest news and answer questions about current events. What would you like to know?",
+          text: "Hello! I'm Siri's News Assistant. I can help you find the latest news and answer questions about current events. What would you like to know?",
           sender: 'bot',
           timestamp: new Date(),
           isWelcome: true
@@ -307,7 +307,7 @@ const ChatUI = () => {
     <div className={`chat-ui ${isDarkTheme ? 'chat-ui--dark' : 'chat-ui--light'}`}>
       <div className="chat-ui__loading">
         <div className="chat-ui__loading-spinner"></div>
-        <p>Connecting to Voosh News Chatbot...</p>
+        <p>Connecting to Siri's News Assistant...</p>
       </div>
     </div>
   );
@@ -317,7 +317,7 @@ const ChatUI = () => {
       <header className="chat-ui__header">
         <div className="chat-ui__header-content">
           <div className="chat-ui__header-left">
-            <h1 className="chat-ui__title">Voosh News Chatbot</h1>
+            <h1 className="chat-ui__title">Siri's News Assistant</h1>
             <div className="chat-ui__status">
               {isConnected ? <span className="chat-ui__status-indicator chat-ui__status-indicator--connected">Connected</span>
                           : <span className="chat-ui__status-indicator chat-ui__status-indicator--disconnected" style={{ color: '#d32020ff' }}>Disconnected</span>}
