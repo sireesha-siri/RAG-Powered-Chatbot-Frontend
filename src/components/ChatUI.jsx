@@ -12,6 +12,7 @@ const ChatUI = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [error, setError] = useState(null);
 
   const messagesEndRef = useRef(null);
@@ -81,10 +82,13 @@ const ChatUI = () => {
 
       const savedSessionId = localStorage.getItem('voosh_chat_session_id');
 
-      // Check backend health first
+      // Check backend health first with longer timeout for cold starts
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      const healthResponse = await fetch(`${API_BASE_URL}/api/health`, { signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds for cold start
+      
+      const healthResponse = await fetch(`${API_BASE_URL}/api/health`, { 
+        signal: controller.signal 
+      });
       clearTimeout(timeoutId);
 
       if (!healthResponse.ok) throw new Error('Backend service is not available');
@@ -94,7 +98,7 @@ const ChatUI = () => {
       // Create new session if none exists
       if (!savedSessionId) {
         const sessionController = new AbortController();
-        const sessionTimeoutId = setTimeout(() => sessionController.abort(), 10000);
+        const sessionTimeoutId = setTimeout(() => sessionController.abort(), 60000); // 60 seconds
 
         const response = await fetch(`${API_BASE_URL}/api/sessions`, {
           method: 'POST',
@@ -111,6 +115,7 @@ const ChatUI = () => {
 
       setSessionId(currentSessionId);
       setIsConnected(true);
+      setIsFirstLoad(false); // Mark first load complete
 
       // Load existing chat history
       const historyMessages = await loadChatHistory(currentSessionId);
@@ -130,16 +135,32 @@ const ChatUI = () => {
     } catch (error) {
       console.error('Session initialization failed:', error);
       setIsConnected(false);
-      localStorage.removeItem('voosh_chat_session_id');
-      setSessionId(null);
-      setMessages([{
-        id: Date.now(),
-        text: "I'm unable to connect to the chat service. Please make sure the backend server is running and refresh the page to try again.",
-        sender: 'bot',
-        timestamp: new Date(),
-        isError: true
-      }]);
-      setError(error.name === 'AbortError' ? 'Connection timed out. Please check if the backend is running.' : 'Failed to connect to chat service.');
+      
+      // Different error handling for first load vs reconnection
+      if (isFirstLoad && error.name === 'AbortError') {
+        // Cold start timeout - show friendly message and retry
+        setError('Backend is starting up (free tier). Retrying in 5 seconds...');
+        setTimeout(() => {
+          setError(null);
+          initializeSession(); // Retry
+        }, 5000);
+      } else {
+        // Real error
+        localStorage.removeItem('voosh_chat_session_id');
+        setSessionId(null);
+        setMessages([{
+          id: Date.now(),
+          text: "I'm unable to connect to the chat service. Please make sure the backend server is running and refresh the page to try again.",
+          sender: 'bot',
+          timestamp: new Date(),
+          isError: true
+        }]);
+        setError(
+          error.name === 'AbortError' 
+            ? 'Connection timed out. The backend may be starting up on free tier (takes 30-60s). Please wait and refresh.' 
+            : 'Failed to connect to chat service.'
+        );
+      }
     } finally {
       setIsInitializing(false);
     }
@@ -307,7 +328,16 @@ const ChatUI = () => {
     <div className={`chat-ui ${isDarkTheme ? 'chat-ui--dark' : 'chat-ui--light'}`}>
       <div className="chat-ui__loading">
         <div className="chat-ui__loading-spinner"></div>
-        <p>Connecting to Siri's News Assistant...</p>
+        {isFirstLoad ? (
+          <>
+            <p style={{ fontWeight: 'bold', margin: '8px 0' }}>Starting Siri's News Assistant...</p>
+            <p style={{ fontSize: '14px', opacity: 0.8, margin: '8px 0' }}>
+              Free tier may take 30-60 seconds on first load
+            </p>
+          </>
+        ) : (
+          <p style={{ margin: '8px 0' }}>Reconnecting to Siri's News Assistant...</p>
+        )}
       </div>
     </div>
   );
@@ -333,7 +363,7 @@ const ChatUI = () => {
       </header>
 
       {error && (
-        <div className="chat-ui__error">
+        <div className={`chat-ui__error ${isFirstLoad ? 'chat-ui__error--info' : ''}`}>
           <span>{error}</span>
           <button onClick={() => setError(null)}>×</button>
         </div>
